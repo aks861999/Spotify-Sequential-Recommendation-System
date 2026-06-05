@@ -97,7 +97,6 @@ The full pipeline is a six-stage system, from raw CSV to ranked recommendations:
 └──────────────┘   └──────────────────┘   └───────────────────────┘
 ```
 
-A full technical architecture diagram is available in [`docs/architecture.mermaid`](docs/architecture.mermaid).
 
 ---
 
@@ -406,34 +405,6 @@ Word2Vec embeddings for low-frequency items are unreliable because the stochasti
 ### Why Hit Rate@100 and not a stricter k?
 
 The recommendation list in a Discover Weekly-style product is typically 20–50 items. A k=100 evaluation is intentionally generous — it measures whether the system understands the *neighbourhood* of the correct answer, even if ranking within that neighbourhood is imperfect. Stricter metrics (Hit Rate@10, MRR, NDCG) are appropriate future additions.
-
----
-
-## Project Structure
-
-```
-spotify-sequential-recommendation/
-│
-├── data/
-│   └── spotify_dataset.csv           # Raw #nowplaying dataset
-│
-├── notebooks/
-│   └── Spotify-Sequential-Recommendation-System.ipynb
-│
-├── docs/
-│   └── architecture.mermaid          # Technical architecture flow diagram
-│
-├── src/
-│   ├── preprocessing.py              # Data cleaning and filtering
-│   ├── feature_engineering.py        # Sequence construction, holdout split
-│   ├── train.py                      # Track2Vec training loop
-│   ├── evaluate.py                   # Hit Rate@k evaluation
-│   └── inference.py                  # predict_next_track, final_train_model
-│
-├── requirements.txt
-├── README.md
-└── LICENSE
-```
 
 ---
 
