@@ -1,5 +1,5 @@
 # 🎵 Spotify Sequential Recommendation System
-### Next-Event Prediction via Track2Vec — Word2Vec Transfer Learning Applied to Music Sequences
+### Next-Event Prediction via Track2Vec, Word2Vec Transfer Learning Applied to Music Sequences
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Gensim](https://img.shields.io/badge/Gensim-Word2Vec-E04A2D?style=flat-square)](https://radimrehurek.com/gensim/)
@@ -33,7 +33,7 @@
 
 ## Overview
 
-This project builds a **sequential music recommendation system** that, given a partial playlist of tracks, predicts what a user is most likely to listen to next. The system treats the problem as **Next-Event Prediction (NEP)** — a well-studied formulation in sequential learning where the goal is to predict the next item in an ordered interaction sequence based solely on behavioral history.
+This project builds a **sequential music recommendation system** that, given a partial playlist of tracks, predicts what a user is most likely to listen to next. The system treats the problem as **Next-Event Prediction (NEP)**, a well-studied formulation in sequential learning where the goal is to predict the next item in an ordered interaction sequence based solely on behavioral history.
 
 The central contribution is **Track2Vec**: a domain transfer of Word2Vec's skip-gram architecture to music, where playlists act as *sentences* and individual tracks act as *tokens*. Co-occurrence patterns within playlist windows encode latent musical affinity, allowing the model to learn a 48-dimensional embedding space in which semantically similar tracks (by listening behavior, not audio features) cluster together.
 
@@ -45,15 +45,15 @@ This is the same paradigm behind Spotify's own published research ([song2vec](ht
 
 > *"Can we suggest what to listen to next when presented with a sequence of songs?"*
 
-A user's playlist is an ordered sequence of interactions. The task is to learn from thousands of such sequences — each constructed by real people with real taste — and then generalise: given any new, unseen partial sequence, retrieve the most likely continuation.
+A user's playlist is an ordered sequence of interactions. The task is to learn from thousands of such sequences, each constructed by real people with real taste, and then generalise: given any new, unseen partial sequence, retrieve the most likely continuation.
 
-This is a **purely behavioural** approach. No audio features, no genre tags, no artist metadata. The model learns entirely from the structure of co-occurrence in playlists — which is precisely the signal that matters most in collaborative, preference-driven recommendation.
+This is a **purely behavioural** approach. No audio features, no genre tags, no artist metadata. The model learns entirely from the structure of co-occurrence in playlists, which is precisely the signal that matters most in collaborative, preference-driven recommendation.
 
 ---
 
 ## Dataset
 
-The dataset is derived from the **#nowplaying dataset**, a collection of tweets in which Spotify users publish their currently playing track via the `#nowplaying` hashtag. It captures organic, real-world listening behaviour — not artificially curated sequences.
+The dataset is derived from the **#nowplaying dataset**, a collection of tweets in which Spotify users publish their currently playing track via the `#nowplaying` hashtag. It captures organic, real-world listening behaviour, not artificially curated sequences.
 
 | Field | Description |
 |---|---|
@@ -115,8 +115,8 @@ df.columns = (df.columns
 # Result: ['user_id', 'artist', 'track', 'playlist']
 ```
 
-#### Noise Filtering — Motivated by Power-Law Analysis
-Before applying any filter, the project formally tests whether the artist frequency distribution follows a power law using `powerlaw.Fit(discrete=True)`. The resulting log-log CCDF confirms Zipf's law holds — a small number of artists dominate the corpus while the majority appear only a handful of times. This statistical evidence justifies the subsequent filter.
+#### Noise Filtering, Motivated by Power-Law Analysis
+Before applying any filter, the project formally tests whether the artist frequency distribution follows a power law using `powerlaw.Fit(discrete=True)`. The resulting log-log CCDF confirms Zipf's law holds, a small number of artists dominate the corpus while the majority appear only a handful of times. This statistical evidence justifies the subsequent filter.
 
 ```python
 # Keep only artists with sufficient representation
@@ -126,7 +126,7 @@ df = df.groupby('artist').filter(lambda x: len(x) >= 50)
 **Why 50?** The power-law analysis shows the inflection point where artist representations become too sparse to yield reliable co-occurrence statistics for embedding training. Below this threshold, tracks associated with an artist would have too few playlist neighbours to produce a meaningful embedding.
 
 #### Cold-Start Mitigation
-Users with fewer than 10 unique artists in their playlists are excluded. These users provide insufficient signal to learn meaningful sequence patterns from, and including them would introduce noise that actively harms generalisation to new users — the classic **cold-start problem**.
+Users with fewer than 10 unique artists in their playlists are excluded. These users provide insufficient signal to learn meaningful sequence patterns from, and including them would introduce noise that actively harms generalisation to new users, the classic **cold-start problem**.
 
 ```python
 df = df[df.groupby('user_id').artist.transform('nunique') >= 10]
@@ -137,7 +137,7 @@ df = df[df.groupby('user_id').artist.transform('nunique') >= 10]
 
 ### 2. EDA and Statistical Analysis
 
-**Artist and track distributions** are visualised with log-scale histograms. The y-axis log scaling is not cosmetic — it is necessary to see the shape of the distribution, which would appear as a flat spike against a near-zero baseline on a linear scale.
+**Artist and track distributions** are visualised with log-scale histograms. The y-axis log scaling is not cosmetic, it is necessary to see the shape of the distribution, which would appear as a flat spike against a near-zero baseline on a linear scale.
 
 **Power-law fitting:**
 ```python
@@ -158,14 +158,14 @@ The solid line (empirical PDF) and dashed line (fitted power law) overlap closel
 Two composite identifiers are constructed to avoid ambiguity:
 
 ```python
-# Namespace playlists to a user — same playlist name across users is treated differently
+# Namespace playlists to a user, same playlist name across users is treated differently
 df['playlist_id'] = df['user_id'] + '-' + df['playlist']
 
-# Namespace tracks to an artist — same track title by different artists is treated differently
+# Namespace tracks to an artist, same track title by different artists is treated differently
 df['track_id'] = df['artist'] + '|||' + df['track']
 ```
 
-The `|||` separator is chosen deliberately — it is unlikely to appear in any artist or track name, preventing collision.
+The `|||` separator is chosen deliberately, it is unlikely to appear in any artist or track name, preventing collision.
 
 #### Sequential Grouping and Last-Item Holdout
 
@@ -210,7 +210,7 @@ The shuffle uses `random_state=42` for reproducibility. The 80/10/10 split is st
 | Word co-occurrence | Tracks appearing near each other in a playlist |
 | Semantic similarity | Musical affinity / shared listening context |
 
-This analogy is not superficial. Word2Vec learns that words with similar *contexts* have similar *meanings*. Applied to playlists, a track's context is the set of tracks a user placed near it. Two tracks that consistently appear in similar playlist neighbourhoods across many users share something real — tempo, mood, genre, or cultural moment — even if the model never sees those features directly.
+This analogy is not superficial. Word2Vec learns that words with similar *contexts* have similar *meanings*. Applied to playlists, a track's context is the set of tracks a user placed near it. Two tracks that consistently appear in similar playlist neighbourhoods across many users share something real, tempo, mood, genre, or cultural moment, even if the model never sees those features directly.
 
 #### Architecture
 
@@ -238,7 +238,7 @@ track2vec_model = Word2Vec(train['track_sequence'].tolist(), **hyperparams)
 | `window` | 10 | Captures global playlist context without noise from distant, weakly-related tracks |
 | `ns_exponent` | 0.75 | Standard value; balances between uniform (1.0) and frequency-proportional (0.0) negative sampling |
 | `epochs` | 30 | Sufficient convergence without overfitting; confirmed by validation metric plateau |
-| `min_count` | 20 | Selected by grid search — see Hyperparameter Tuning |
+| `min_count` | 20 | Selected by grid search, see Hyperparameter Tuning |
 
 #### Training
 
@@ -258,7 +258,7 @@ print(f"Vector space size: {len(track2vec_model.wv.index_to_key)}")
 
 ### 5. Hyperparameter Tuning
 
-`min_count` is the most consequential hyperparameter for this model class. It controls the vocabulary size — a direct tradeoff between **coverage** (recommending more tracks) and **quality** (having reliable embeddings for fewer tracks).
+`min_count` is the most consequential hyperparameter for this model class. It controls the vocabulary size, a direct tradeoff between **coverage** (recommending more tracks) and **quality** (having reliable embeddings for fewer tracks).
 
 Grid search over `min_count ∈ {3, 5, 10, 20}`, evaluated by **Hit Rate @ k=100** on the validation set:
 
@@ -278,7 +278,7 @@ hypers_sets = [
 | 10 | 1,560 | 0.0129 | 0.0129 |
 | **20** | **319** | **0.0198** | **0.0198** |
 
-**Interpretation:** As `min_count` increases, the vocabulary shrinks but embedding quality improves dramatically — Hit Rate nearly triples from `min_count=3` to `min_count=20`. Sparse tracks (those appearing fewer than 20 times) produce poorly-trained vectors because they have too few context examples to reliably estimate the skip-gram gradient. Including them pollutes the embedding space and reduces the signal-to-noise ratio of K-NN lookups.
+**Interpretation:** As `min_count` increases, the vocabulary shrinks but embedding quality improves dramatically, Hit Rate nearly triples from `min_count=3` to `min_count=20`. Sparse tracks (those appearing fewer than 20 times) produce poorly-trained vectors because they have too few context examples to reliably estimate the skip-gram gradient. Including them pollutes the embedding space and reduces the signal-to-noise ratio of K-NN lookups.
 
 This is a **quality-over-coverage tradeoff**: the model recommends from a smaller pool of tracks, but those recommendations are significantly more accurate.
 
@@ -315,9 +315,9 @@ def predict_next_track(vector_space, input_sequence, k):
 **Design notes:**
 - **Anchor selection:** Uses only the last track in the sequence as the query vector. This is consistent with the skip-gram training objective and avoids the complexity of sequence aggregation while remaining effective.
 - **OOV fallback:** Rather than raising an error on out-of-vocabulary tracks, the engine degrades gracefully by sampling a random in-vocabulary track. In a production setting, this could be replaced with nearest-neighbour lookup in a metadata embedding space.
-- **Cosine similarity:** `most_similar()` ranks by cosine similarity in the 48-dimensional space, which is invariant to vector magnitude — appropriate for comparing normalised embedding vectors.
+- **Cosine similarity:** `most_similar()` ranks by cosine similarity in the 48-dimensional space, which is invariant to vector magnitude, appropriate for comparing normalised embedding vectors.
 
-#### Evaluation Metric — Hit Rate @ k
+#### Evaluation Metric, Hit Rate @ k
 
 ```python
 def evaluate_model(df, vector_space, k):
@@ -339,8 +339,8 @@ KNN_K = 100
 val_hr  = evaluate_model(validate, track2vec_model.wv, k=KNN_K)
 test_hr = evaluate_model(test,     track2vec_model.wv, k=KNN_K)
 
-print(f"Hit Rate@{KNN_K} — Validation : {val_hr:.4f}")
-print(f"Hit Rate@{KNN_K} — Test       : {test_hr:.4f}")
+print(f"Hit Rate@{KNN_K}, Validation : {val_hr:.4f}")
+print(f"Hit Rate@{KNN_K}, Test       : {test_hr:.4f}")
 ```
 
 ---
@@ -362,12 +362,12 @@ The validation and test metrics align closely, indicating no overfitting during 
 Input track: "Calvin Harris|||Sweet Nothing"
 
 Recommendations:
-  1. Martin Garrix|||Animals       — similarity: 0.9900
-  2. Usher|||Scream                — similarity: 0.9894
-  3. Don Omar|||Danza Kuduro       — similarity: 0.9860
+  1. Martin Garrix|||Animals      , similarity: 0.9900
+  2. Usher|||Scream               , similarity: 0.9894
+  3. Don Omar|||Danza Kuduro      , similarity: 0.9860
 ```
 
-The recommendations are musically coherent: the model surfaces high-energy dance tracks from the same era, learned purely from co-occurrence in user playlists — with no access to genre labels, BPM, or audio features.
+The recommendations are musically coherent: the model surfaces high-energy dance tracks from the same era, learned purely from co-occurrence in user playlists, with no access to genre labels, BPM, or audio features.
 
 ### Qualitative Embedding Validation
 
@@ -378,7 +378,7 @@ Top-3:  Dave Matthews Band|||Everyday        (0.9974)
         The Black Keys|||Thickfreakness       (0.9970)
 ```
 
-These are stylistically adjacent tracks — indie rock / alternative with similar cultural placement — which confirms the embedding space encodes genuine musical context rather than random correlations.
+These are stylistically adjacent tracks, indie rock / alternative with similar cultural placement, which confirms the embedding space encodes genuine musical context rather than random correlations.
 
 ---
 
@@ -388,9 +388,9 @@ These are stylistically adjacent tracks — indie rock / alternative with simila
 
 A recurrent model (GRU, LSTM) or a Transformer would model the full sequence order, while Word2Vec only models local co-occurrence. The choice of Word2Vec is deliberate for this dataset scale:
 
-- The dataset (after filtering) has ~319 vocabulary items and ~76K sequences — borderline for training a deep sequence model without regularisation overhead.
+- The dataset (after filtering) has ~319 vocabulary items and ~76K sequences, borderline for training a deep sequence model without regularisation overhead.
 - Word2Vec's skip-gram objective is extremely sample-efficient and trains in seconds on CPU.
-- The recommendation signal in playlists is primarily driven by *co-occurrence* (what tracks appear together) rather than strict ordering — users rearrange playlist order frequently.
+- The recommendation signal in playlists is primarily driven by *co-occurrence* (what tracks appear together) rather than strict ordering, users rearrange playlist order frequently.
 
 Word2Vec is a strong, interpretable baseline. A natural extension is to replace the anchor-based lookup with a sequence-averaged or attention-weighted query vector.
 
@@ -404,7 +404,7 @@ Word2Vec embeddings for low-frequency items are unreliable because the stochasti
 
 ### Why Hit Rate@100 and not a stricter k?
 
-The recommendation list in a Discover Weekly-style product is typically 20–50 items. A k=100 evaluation is intentionally generous — it measures whether the system understands the *neighbourhood* of the correct answer, even if ranking within that neighbourhood is imperfect. Stricter metrics (Hit Rate@10, MRR, NDCG) are appropriate future additions.
+The recommendation list in a Discover Weekly-style product is typically 20–50 items. A k=100 evaluation is intentionally generous, it measures whether the system understands the *neighbourhood* of the correct answer, even if ranking within that neighbourhood is imperfect. Stricter metrics (Hit Rate@10, MRR, NDCG) are appropriate future additions.
 
 ---
 
@@ -490,7 +490,7 @@ Don Omar|||Danza Kuduro                            similarity: 0.9860
 ## Future Work
 
 **Sequence-aware query encoding:**
-Replace the single-anchor lookup (`seq[-1]`) with a weighted average of all tracks in the input sequence — or use an attention mechanism to dynamically weight which tracks in the history are most predictive.
+Replace the single-anchor lookup (`seq[-1]`) with a weighted average of all tracks in the input sequence, or use an attention mechanism to dynamically weight which tracks in the history are most predictive.
 
 **Temporal modelling:**
 Incorporate the order of tracks within a playlist using positional encodings or recurrent architectures (GRU, Transformer). The current model treats playlists as sets; strict ordering is unused.
@@ -502,7 +502,7 @@ Add MRR (Mean Reciprocal Rank), NDCG@k, and Coverage metrics. Hit Rate@100 is a 
 Evaluate on the full 644K-row dataset without the 5% sample. Test whether a larger `vector_size` (e.g., 128, 256) and larger `min_count` threshold yields further gains.
 
 **Continual / online updates:**
-Investigate incremental Word2Vec updates to incorporate new tracks and playlists without full retraining — directly relevant to production music platforms where the catalogue changes daily.
+Investigate incremental Word2Vec updates to incorporate new tracks and playlists without full retraining, directly relevant to production music platforms where the catalogue changes daily.
 
 **Cold-start handling:**
 For tracks below the `min_count` threshold (OOV at inference), implement metadata-based fallback: embed track features (artist, release year, genre tags) and find the nearest in-vocabulary track as a proxy query.
@@ -514,7 +514,3 @@ For tracks below the `min_count` threshold (OOV at inference), implement metadat
 This project is released under the [MIT License](LICENSE).
 
 ---
-
-<p align="center">
-  Built with curiosity, playlists, and an unhealthy amount of Gensim documentation.
-</p>
